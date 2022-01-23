@@ -1,0 +1,66 @@
+Spring Cloud nedir ? Avantajları nelerdir ?
+
+Spring frameworku 2002 yılında Dependecy Inversion , Singleton Design Paternı uygulamak üzere geliştirilmi bir framework.Ancak daha sonra büyüyor ve popülerlik kazanıyor.
+Microservis geliştirirken briçok zorluklardan bahsetmiştik.
+
+Spring Cloud üzerinde bir takım hazır bileşenler bizim daha rahat konfigurasyon ve geliştime yapmamızı sağlayacak.
+
+1. ConfigServer :
+En temel de ConfigServer hizemtini bize sağlar.Bütün konfigurasyonlarımızı tutacağımız bir server.Bu konfigurasyonları istersek Git üzerinde istersek de File System üzerinde tutabiliyoruz.
+Aslında yazılım dünyasındaki tüm sistemler bir ihtiyaçdan ortaya çıkar.
+Config Server dağıtık olarak konulandırabiliriz.
+Config Server Encryption ve Decryption (şifreleme ve şifre çözme) yeteneğine sahip.Bütün şifrelermizi ve konfigurasyonalrını bir yerde tutacaksak (örnek : git) bunalrın güvenliği için şifreleme.
+Spring Framework tarafınfa kullandığımız tüm bileşenlerde , Config Servera bir entegrasyon gerekmiyor.Sadece @EnableConfigServer diye bir anastasyonla config serverın bir adresini verdiğimiz de bağlanabiliriz.	
+
+2.Service Register( Netflix Eureka server)
+Service Registere hizmeti sağlar.Ve Servislerimiz hepsini bir yere register edip bir katolog oluşturmamızı sağlar.
+Mesela Netflixin Eureka serverını Service Register olarak kullabiliyoruz.
+Config Server ile iletişim sağlar.
+Eureka Serverın hem server hem client tarafı var.Client tarafında kendi apilerımızda ve microservislerimiz için kullanacağız.Server tarafını ise hepsini bir yere toplamak için.
+
+3.Loglama ve takip için(Spring Cloud Sleuth)
+	  
+Loglama ve takip için  bir takım bileşenler framework de sağlanıyor.
+Spring Cloudn Sleuth bize burada hizmet veriyor.Ve mesajların ve logların takibini sağlıyor.
+Bir tane requestin 10 tane microservise uğradığını düşünelim.Mesela 7.mikroservis de hata aldıysa bunu takip etmek zor.
+Bunun için Sleuth'u tüm servislerimizde aktif hale getirdiğimizde (anatasyonlarla aktif  hale getirebiliriz.), hangi servise gittiğini hangi servis de hangi request ve responseu aldığını görebiliyoruz.  
+Bu takibi ve trace(iz) leri takip etmemiz için bir Dahboarda(server) a ihtiyacımız olabilir.Bununla ilgili bazı ürünler var.Zipkin,Elastic LogStash Kibana (ELK) ürünlerden bazılarıdır.Bunlar hem server hem cleint tarafınfa hizmet sağlıyor.
+  
+ 
+4.Spring Cloud Stream Library
+
+Servislerimizi birbiri arasında konuşması için bazı bileşenleri sağlıyor.->Kuyruk sistemleri .Ve bunu da Stream library şeklinde sunuyor.
+Stream -> Kafka ,RabbitMQ gibi  kuyruk sistemlerle kolaylıkla entegrasyon yapmamızı sağlar.
+CQRS dediğimiz design pattern  projelerinde kuyruk yapısı çok kritikdir ve her şey kuyruk üzerinden konuşuyor.Spring de bize burada da bize destek sağlıyor.(Stream)
+CQRS(Command Query Responsibility Segregation) : ’Command’ ve ‘Query’ sorumluluklarının ayrılması prensibini esas alan bir yaklaşımı.Bir dökümanda anlatacağım.
+
+
+5.Load balancer (Yük dengeleme)
+Load balancer için bir hizmet sağlıyor.Böylece hangi servisin yükü fazla ise diğerine aktarsın vs.
+Konfigurasyon ve anatasyonlarla kolayca servisler arasındaki yük dağılımını yönetebiliriz.Hem servisler arasında (Service to Service call) hem de sistemiz arasında gelen yükün instancelar arasındaki yük dağılımında. 
+
+6.Circut Broker
+Birbiri ardında çalışan servislerden bir tanesi hata alıyorsa kesme işlemi yapılması için kullanacağımız bir bileşen.
+Mesela bir request geldiğinde hata veriyorsa birdahaki gelişinde bu requesti kesebilme işleri gibi yapı oluşturabiliriz.
+Aslında bu bir design pattern.
+
+7. Bütün classlarımızı  yönetmek için kullandığımız bir cluster management tarafında hazır sunulan bir yapı var.Spring boot admin ,Dashbord gibi tüm servislerimizi görüntüleyebilmemizi sağlıyor.
+ 
+
+Disturbuting messaging için sağlanılan  bir yapı var.
+
+8.AuthServer
+Microservislerde Autantication Autarizationun zor olduğundan bahsetmiştik.Bunun için AuthServer yapısını hizmete açıyor.
+Bununla requestlerimizin güvenliğini sağlarız.
+OAuth2 üzerinden harici kullandığımız Autantication Autarization serverlar ile entegrasyonu sağlar.Mesela Redhatin open source geliştirdiği keycloak ürünü.
+Meselaben her şeyi keycloak üzeridnen yöneteceğim vs de diyip , AuthServer bunula çalışsın diyebiliriz.
+OAuth2 yetkilendirme işlemleri için kullanılan standartlaşmış bir protokoldür.
+
+
+9.Api Gateway
+Tüm endpointlerimizi bir yerde toplanması gerekiyor.Bir yerde bunların yönetilmesi gerekiyor.Bunun içi API Gateway hizmeti sağlıyor.
+Routinglerimizi yönetebiliyoruz.
+Diğer bileşenlerle entegrasyon.
+Requestleri kısıtlayp , yönetebiliriz.Requestdeki parametrelere göre işlemler yapabiliriz.
+Not:Yukarıdaki tüm bileşenler birbiri ile çalışır.Spring Cloud ailesindeki tüm bileşenler birbiri ile çalışır.
+

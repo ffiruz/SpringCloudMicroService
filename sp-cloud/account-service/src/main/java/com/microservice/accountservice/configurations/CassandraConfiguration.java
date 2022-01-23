@@ -47,9 +47,5 @@ public class CassandraConfiguration extends AbstractCassandraConfiguration {
     public String[] getEntityBasePackages() {
         return new String[]{"com.microservice.accountservice"};
     }
-    @Override
-    public  CassandraClusterFactoryBean cluster()
-    {
 
-    }
 }
