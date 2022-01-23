@@ -1,0 +1,59 @@
+Bir mikroservisi tercih etmemizde  4 temel neden vardır.
+
+1.Ölçeklenebilirlik(Scalability): 
+	
+	2 ye ayrılır.Yatayda (horizantel) ölçeklenebilirlik ve Dikeyde (Vertical) ölçeklendirme. ,
+	Dikey ölçeklenebilirlik : Uygulamanın hizmet edilebilirğini donanım bazında büyütüyoruz.
+	Mesela bir sunucumuz (bilgisayarımız) var ve belli müşteriye hizmet ediyoruz.Müşteri sayısı arttıkça, RAM i, işlemciyi arttırmamız  gerekir vs.Bir noktadan sonra donanım satın almamız gerekebilir.
+	Monolitik bir uygulamada , bir donanım (bir sunucu) daha satın almamız bizi zora sokacak.Çünkü monolitik bir uygulamda oturum bir merkezden yönetiliyor.İşte sıkıntı buradan başlıyor.
+	Yatay ölçeklenebilirlik:Uygulamanın kopyasını oluşturmaktır.Yatay ölçeklenebilirlik , dikeydeki ölçeklenebilirlikten daha zordur.Anacak dikeydeki ölçeklenebilirlik ise daha pahalıdır.
+	Uygulamanın yükü arttığında kendisinin bir kopyasını oluşturur.Mesela Kubernetes bunu yapabiliyor.Requestlerin anlık sayısına göre kopyalama durumu çözülebilir.Mesela 1000 request de bir tane uygulama instance ı yükü karşılarken ,
+	1000 requestden sonra bir tane daha uygulama instance ı kopyalanır gibi.Aynı zamanda her bir microservis bu instance lar olduğu için tak-çıkar vs kolay ulaşılabilir.
+	Not:Bir monolitik uygulamada ölçeklenebilirlik mümkün değildir yaklaşımı doğru değildir.
+	
+	 
+
+2.Esneklik: 
+
+      Bir koddaki veya servisdeki hatanın tüm uygulamayı etkilememesi ve bloklamaması.Bu bize esneklik kazandırır.
+      Mesela monolitik bir uygulamamız olduğunu düşünelim.Ve uygulamanın bir noktasında image processing yapıyoruz.Bu processing de JVM üzerinde yoğunluktan dolayı bir memory problemi çıktığını düşünelim.Bu durumda tüm uygulamayı kaybederiz.
+      Bir microservis bazında ise sadece o servisi kaybederiz ancak servisin bir kopyası olduğunu düşünürsek (madde 1) , o kopyadan sorun olmamış gibi devam edilebilir.		
+
+3.CI (Countinous Entegration) ve CD (Continous Delivery) süreci : 
+	
+      Yayınlama pipeline.Bir uygulamanın geliştirilmesinden , testine ve müşteriye sunulmasına kadar ki geçen süre.
+      Uygulamamızı küçük parçalara böldüğümüz için uygulamayı deploy etmek kolay.
+      Fazla sayıda deployment pipeline oluşturabiliriz.Mesela öğreniğimizde Account, Ticket ve Notification servislerimiz var.Account servisi saat 12.00 de yük almadığıdan o sürede deployment yapılrken , Ticker servisi saat 14.00 deploy yapılabilir.
+      	
+
+4.Teknoloji Çeşitliliği: 
+
+      Back end tarafınfa Java tabanlı bir uygulamamız var.Ancak hesaplama yapılan bir işin Pythonda daha performanslı çalıştiğini düşünelim.Bu noktada Python ı ayrı bir microservis olarak tasarlayabiliriz.
+      Bu da teknoloji ve isnan gücü çeşitliliğini sağlar.Bunu monolit bir uygulama da yapacağını düşünürsek bilgisayarımızda Java ve Pythonun (daha fazlası vs.) yüklü olması gerekir.bunların hepsi vs mümkün olmayabilir.
+      Tüm projeyi bilmeden  bir hatayı çözemez duruma gelebiliriz Monololitik bir uygulamada.Ancak microservis de projeyi dağıttığımızda servis kendimize özelleşmiş oluruz.
+     	
+
+
+MicroServisi tercih etmemiz gereken durumlarda vardır.
+
+Session yönetimi,Autantication ve Autarization microservis de zordur.Çünkü sen bir tane servisden login olabiliyorken , birçok serviden login olabiliyorsun.Monolitik debu  daha kolaydır.
+İşlem bütünlüğünün sağlanması ve transactional management konularında microservis zordur.Mesela , 10 tane servisim var ve bu 10 tane servisimden de OK alırsam işlemim başarılı olacak.
+Tüm envartelerin (SERVİCE,DATABASE,KUYRUK,LOG,CONFİG SERVER vs.) birlikte çalışması zor bir süreç.Sevis registerlar (Hangi request, hangi servise gidecek), Instance register(Hangi request , hangi uygulamanın hangi sunucusuna gidecek vs.) bunlaro konfigurasyonu zordur.
+Bu kadar bileşenin birbiriyle etkileşimi , bağlantıları, dependecileri , birinin fail olmasının diğerine etkisi vs .
+Mesela bir servis hata aldığında o instance ı kapat ve yeni bir instance ayağa kaldır -> Kubernetes yapıyor.Ama bu kubernetesi yönetmek de ayrı bir uzmanlık gerekir.
+Artıları ve eksilerimizi değerlendirmemiz gerekir.
+
+Özetle-->
+
+->Bir mikroservisin bağlılıkları iyi yönetilmeli ve her servis diğer servisinden bağımsız olmalı.Birbirlerine az ihtiyacı olmalı.
+->Her servisin instanceları aynı versiyon ile çalışmalı.Yani herbirinde aynı kod olmalı.Instance -> Uygulamanın bir kopyası
+->Her servis bir işi doğru şekilde yapacak şekilde tasarlanmalı.Yani bu servis kendi işinin dışına çkıp başka iş de yapmamalı.Microservsisin avantajları için önemli.
+->Her servis yapacağı iş özelinde doğru teknolojilerle çalışıyor olmalı.
+->Her servisin kendi CI ,CD pipeline ı olmalı.
+->Her servis kendisine ait container içinde çalışmalı.Bir container içinde bir servis olmalı.veri tabanlarıda ayrı olmalı.
+->Servisler arası ilerişimler için contractlar önceden tanımlanmalı.Bu contractlar dışında iletişim olmamalı.İyi tanımlayıp iyi dizayn edilmeli.Mesela bir servisi deploy etttin diye diğer servisleri de deplot etmen gerekirse monolit yapıya dönüşüm olur.
+->Tüm servis ve sistemlerde loglama ,metrikler ,hata yönetimi,güevenlik iyi yönetilmeli.
+->Microservis : Yani bir uygulamanın atomik olarak kendi başına çalışabilir küçük yapılar haline getirlip bunların yönetilebilirliğini(çalışma konusudan) kolaylaştırmak.Dağıtımını   kolaylaştırmak.
+Not:Web servis (Restful vs) geliştimek microseris geliştimek değildir.Spring boot diye kullanıyoruz diye microservis geliştiryoruz anlamı taşımamalı.
+
+	      	

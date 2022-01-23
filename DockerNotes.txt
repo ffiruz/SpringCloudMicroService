@@ -1,0 +1,34 @@
+Cassandra veritabının docker ile kurulumu ve kullanımı:
+
+->Cassandra Apache tarafırından gerçekleştirilen bir veritabı.NoSQL dir.
+DockerHub üzerinden indireceğiz.
+Docker içerisinde bir image oluşturacak.ve orada ayağa kalkacak.Cassandra Server Instance
+Coomand:
+docker hub -> $ docker run --name some-cassandra --network some-network -d cassandra:latest  :Son versiyon
+
+---->Şuanlık için network u commandden silebiliriz.Çünkü network genellikle cluster kullanıldığı zaman kullanılır.(--network some-network commandden çıkarabiliriz.)
+---->docker run --name some-cassandra -d cassandra:latest
+---->Şuanlık için bir isim de vermeyelim.Bu nedenle "--name some-cassandra" yı çıkaralım.
+--->docker run -d cassandra:latest 
+
+Yukarıdaki command i çalıştırmamız yeterli değil.Cassandranın hizmet verdiği portları kendi local bilgisayarımıza expose (ortaya çıkarmak) etmemiz gerekli.
+Bunun içinde bir port yönlendirmesi vermemiz gerekir.
+Cassandranın default çalıştığı port 9042 .İşte bu portu kendi bilgisayarımızdaki 9042 portuna yönlendirmemiz gerek.Eğer cluster lı çalıştırmamız gerektiğin 7000 portunu kullanıyor.
+docker run  -p 9042:9042 -d cassandra:latest  -:)   bu haliyle cmd de çalıştıralım.
+
+Not: Birden fazla image ile çalıştığımızda sürekli yukarıda belittiğim comman i çalıştırıp durdurmak veya bir çok imageı bu şekilde ayağa kaldırmak mantıklı değil.
+Bu nedenle bir compose file içerisinde biraraya getireceğiz.Projede resources altında compose-file dosyamızı oluşturacağız.İsmini docker-compose dedik  ve uzantının .yml olduğunu bilelim.
+
+Docker komutları
+
+->docker ps :Çalışan imageların durumunu gösterir.
+->docker stats ->Çalışan imageların ne kadar cpu tükettiklerini gözlemleyebilriz.
+-> docker stop image_name -> image ı durdurur.
+->docker stop $(docker ps -aq)->Tüm docker imagelarını durdurur.
+->Projede ki resources dizinine gittikten sonra -> docker-compose -f docker-compose.yml up -d   ->Bu komutile docker-compose dosyasındaki tüm imageları çalıştırırız.
+
+
+
+
+
+

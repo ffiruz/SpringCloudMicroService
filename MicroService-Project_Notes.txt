@@ -1,0 +1,34 @@
+Microservis projemizde 3 tane micro servis oluşturacağız.(Account,Ticket,Notification)
+Ve bu micro servislerin kendi db leri olack.
+Account DB --->Cassandra  (Dağıtık bir veri tabanı)
+Ticker DB-->ElasticSearch  and MySql (Text araması için ->elastic,Elastic search uzun vadede veri tutmak için uygun değil.Bu nedenle MySql kullanıyoruz.)
+Notification DB ->PostgreSQL /alert veya cep telefonlarına giden bildirimler veya mail işlemleri)
+
+->Microservislerin birbiri arasındaki iletişimi ve senkronizasyonu RabbitMQ ile sağlayacağız.
+
+Management Services
+
+->Spring cloudun getirdiği bileşenleri kullancağız.
+-->ConfigServer --> Bizim birçok microservisimiz var.Ve bu microservisler bir sunucuda ayağa kalkacak.Bazen bir servise çok istek geldiğinde , o servisin ayağa kalktığı sunucuların bir instance ı vs de ayağa kalkabilir.Bu configleri genel olarak ayarladğımız yer diyebiliriz.
+-->Eureka -->Bizim birçok servisimiz hatta bir çok sunucumuz olabilir.Burada hangi request hangi sunucuya veya IP ye gidecek ? gibi bir servis registerdır.
+Mesela , Account servisinden 10 tane ,Ticket servisinde 5 tane ,Notification servisinde 20 tane olabilir.Bu servislerin ıp adresleri ve bilgilerinin depolandığı bir katalog gibi düşünebiliriz.
+-->AuthServer-->Autantication ve Autorization işlemleri için gerekli bir serverdır.Gelen requestin hangi dataya veya servera erişeceği kontrollerini yaptığımız yer.	
+-->Hystrix-->Servisler kendi aralrında hep iletişimdedier ve çok fazla bağlantı vardır.Euraka Account ile ,Account Rabbit ile vs.Bu büyük iletişim ağında bir hata olduğu zaman o hatanın takipi ve ana kaynağını bulmak , log takibini yapan yer.
+-->Api Gateway--> Dışarıya açılan yer.Eureka server dan bilgileri alacak.
+-->Frontend Web App->Api Gateway  ile çalışacak.
+
+
+Örnek senaryo :
+
+Bir tane ticker oluşturuldu.Ardından getAssignee le hangi Account a atandığı bilgisi alınır.
+Ardından atanan kişi bilgisi alındıktan sonra Queue (Kuyruk) a , bir Push Notification bilgisi set edilir.
+Ardından kuruğu Notification servisi dinler.
+İşte burada Ticket servisini geliştiren sadece Ticket oluşturmaktan sorumlu.
+Notification servisini geliştiren ise sadece kuruğu dinleyerek kullanıcılara bildirim yapar.
+Birbiriyle bağlantısı kuyruk.
+
+
+Burada her bir yapı bir proje olarak oluşacak.Mesela Account için ayrı bir proje , diğerleri için de..
+ 
+
+
